@@ -45,7 +45,7 @@ Ensure you have the following installed:
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/yourusername/amoeba-division-simulation.git
+    git clone https://github.com/mofasuhu/amoeba-division-simulation.git
     cd amoeba-division-simulation
     ```
 
