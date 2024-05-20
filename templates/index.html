@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amoeba Division Simulation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#initBtn').click(function () {
+                var month = $('#monthInput').val();
+                $.ajax({
+                    url: '/init',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'month': month }),
+                    dataType: 'json',
+                    success: function (data) {
+                        alert(data.message);
+                    },
+                    error: function (error) {
+                        alert('Error: ' + error.responseText);
+                    }
+                });
+            });
+
+            $('#runBtn').click(function () {
+                var steps = $('#stepsInput').val();
+                $.ajax({
+                    url: '/run',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'steps': steps }),
+                    dataType: 'json',
+
+                    success: function (response) {
+                        $('#results').empty();
+
+                        // Define the column order as per your DataFrame arrangement
+                        const columnOrder = ['step', 'month', 'temperature', 'water_quality', 'intact', 'dividing', 'divided', 'stressed', 'encysted', 'excysted'];
+
+                        // Create a table element
+                        var table = $('<table>').addClass('dataTable');
+                        var thead = $('<thead>');
+                        var headerRow = $('<tr>');
+
+                        // Append headers based on predefined order
+                        columnOrder.forEach(function (key) {
+                            headerRow.append($('<th>').text(key));
+                        });
+                        thead.append(headerRow);
+                        table.append(thead);
+
+                        // Display the graph
+                        var img = $('<img>').attr('src', 'data:image/png;base64,' + response.graph);
+                        $('#results').append(img);
+
+                        // Append body rows
+                        var tbody = $('<tbody>');
+                        response.dataframe.forEach(function (row) {
+                            var tr = $('<tr>');
+                            columnOrder.forEach(function (key) {
+                                tr.append($('<td>').text(row[key])); // Create cells in the order of 'columnOrder'
+                            });
+                            tbody.append(tr);
+                        });
+                        table.append(tbody);
+
+                        $('#results').append(table);
+                    },
+                    error: function (error) {
+                        alert('Error: ' + error.responseText);
+                    }
+                });
+            });
+
+            $('#runMesa').click(function () {
+                var month = $('#monthInputMesa').val();
+                $.post('/start_mesa', { month: month }, function (data) {
+                    alert(data.message);
+                });
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table.dataTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.dataTable,
+        table.dataTable th,
+        table.dataTable td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table.dataTable th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Amoeba Division Simulation</h1>
+    <div>
+        <label for="monthInput">Enter the initial month (1-12):</label>
+        <input type="number" id="monthInput" min="1" max="12" value="1">
+        <button id="initBtn">Initialize Model</button>
+    </div>
+    <div>
+        <label for="stepsInput">Enter the number of simulation steps:</label>
+        <input type="number" id="stepsInput" min="1" value="10">
+        <button id="runBtn">Run Simulation</button>
+    </div>
+    <div>
+        <label for="monthInputMesa">Enter the initial month (1-12) for Mesa:</label>
+        <input type="number" id="monthInputMesa" min="1" max="12" value="1">
+        <button id="runMesa">Run Mesa</button>
+    </div>
+
+
+    <div id="results"></div>
+</body>
+
+</html>

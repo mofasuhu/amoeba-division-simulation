@@ -1,0 +1,6 @@
+seaborn==0.13.2
+numpy==1.26.1
+pandas==2.1.1
+matplotlib==3.8.4
+mesa==2.3.0
+flask==3.0.3
